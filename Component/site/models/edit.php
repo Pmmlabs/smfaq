@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -13,7 +13,7 @@ defined('_JEXEC') or die('@-_-@');
 
 //jimport('joomla.application.component.modelform');
 
-require_once JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'smfaq.php';
+require_once JPATH_COMPONENT_ADMINISTRATOR.'/models/smfaq.php';
 
 class SmfaqModelEdit extends SmfaqModelSmfaq
 {
@@ -29,8 +29,8 @@ class SmfaqModelEdit extends SmfaqModelSmfaq
 	
 	public function getForm($data = array(), $loadData = true)
 	{
-		JForm::addFormPath(JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'forms');
-		JForm::addFieldPath(JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'fields');
+		JForm::addFormPath(JPATH_COMPONENT_ADMINISTRATOR.'/models/forms');
+		JForm::addFieldPath(JPATH_COMPONENT_ADMINISTRATOR.'/models/fields');
 			
 		return parent::getForm($data, $loadData);
 	}	

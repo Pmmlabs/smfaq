@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -13,7 +13,7 @@ defined('_JEXEC') or die('@-_-@');
 
 jimport('joomla.application.component.model');
 
-class SmfaqModelQuestion extends JModel
+class SmfaqModelQuestion extends JModelLegacy
 {
 	/**
 	 * Category items data
@@ -51,7 +51,6 @@ class SmfaqModelQuestion extends JModel
 		// Выборка нужных полей.
 		$query->select('a.*');
 		$query->from('`#__smfaq` AS a');
-
 
         if (isset($params->answer_created_by_type) && (int) $params->answer_created_by_type === 1) {
 			$query->select('u.name AS answer_created_by');
@@ -91,11 +90,11 @@ class SmfaqModelQuestion extends JModel
 		$app = JFactory::getApplication('site');
 
 		
-		$id = JRequest::getInt('id');
+		$id = $app->input->get('id', null, 'int');
 		$this->setState('question.id', $id);
 		
-		$catid = JRequest::getInt('catid');
-		$this->setState('category.id', $id);
+		$catid =  $app->input->get('catid', null, 'int');
+		$this->setState('category.id', $catid);
 		$category = JCategories::getInstance('Smfaq')->get($catid);
 		if (!$category) {
 			throw new Exception(JText::_('COM_SMFAQ_ERROR_LOAD_CATEGORY'));

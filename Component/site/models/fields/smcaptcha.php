@@ -40,7 +40,7 @@ class JFormFieldSmCaptcha extends JFormField
 	protected function getInput()
 	{
 		$html = '<div class="captcha">';
-		$html .= '<img id="smfaq-captcha" src="index.php?option=com_smfaq&amp;task=captcha&amp;format=raw&amp;ac='.rand(1, 100000).'" width="120" height="60" alt="'.JText::_('COM_SMFAQ_FORM_CAPTCHA').'" />';
+		$html .= '<img id="smfaq-captcha" src="index.php?option=com_smfaq&amp;task=captcha&amp;ac='.rand(1, 100000).'" width="120" height="60" alt="'.JText::_('COM_SMFAQ_FORM_CAPTCHA').'" />';
 		$html .= '<span onclick="SmFaq.ReloadCapthca()" class="button">'.JText::_('COM_SMFAQ_CAPTCHA_REFRESH').'</span>';
 		$html .= '<input id="captcha" type="text" name="captcha" value="" size="10" />';
 		$html .= '<label class="required" for="captcha">'.JText::_('COM_SMFAQ_INPUT_CAPTCHA').'</label> ';

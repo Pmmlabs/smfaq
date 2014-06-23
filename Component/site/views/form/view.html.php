@@ -13,7 +13,7 @@ defined('_JEXEC') or die('@-_-@');
 
 jimport( 'joomla.application.component.view');
 
-class SmfaqViewForm extends JView
+class SmfaqViewForm extends JViewLegacy
 {
 
 	/**
@@ -23,7 +23,7 @@ class SmfaqViewForm extends JView
 	public function display($tpl = null)
 	{
 
-		$catid = JRequest::getInt('catid', null, 'GET');
+		$catid = JFactory::getApplication()->input->get('catid', null, 'int');
 		if (!$catid) {
 			throw new Exception('Category id not set');
 		}

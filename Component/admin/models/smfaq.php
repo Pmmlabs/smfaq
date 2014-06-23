@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -62,7 +62,8 @@ class SmfaqModelSmfaq extends JModelAdmin
 			// Установка значение по умолчанию.
 			$app = JFactory::getApplication();
 			if (!$data->get('catid')) {
-				$data->set('catid', JRequest::getInt('catid', $app->getUserState('com_smfaq.smfaqlist.filter.category_id')));
+			    $catid = $app->input->get('catid', $app->getUserState('com_smfaq.smfaqlist.filter.category_id'), 'int');
+				$data->set('catid', $catid);
 			}
 		}
 
@@ -106,7 +107,7 @@ class SmfaqModelSmfaq extends JModelAdmin
 	 * Подготовка перед сохранением
 	 *
 	 */
-	protected function prepareTable(&$table)
+	protected function prepareTable($table)
 	{
 		$user = JFactory::getUser();
 		$config = JFactory::getConfig();
@@ -117,7 +118,8 @@ class SmfaqModelSmfaq extends JModelAdmin
 			$categories = JCategories::getInstance('SmFaq');
 			$category = $categories->get((int) $table->catid);
 			$params = $category->getParams();
-			if ($params->getValue('created_by_type')) {
+
+			if ($params->get('created_by_type')) {
 				$table->created_by = $user->get('name');			
 			} else {
 				$table->created_by = $user->get('username');
@@ -188,7 +190,7 @@ class SmfaqModelSmfaq extends JModelAdmin
 		$category = $categories->get((int) $data['catid']);		
 		
 
-		require_once JPATH_SITE.DS.'components'.DS.'com_smfaq'.DS.'helpers'.DS.'route.php';
+		require_once JPATH_SITE.'/components/com_smfaq/helpers/route.php';
 
 		$link = JURI::root().SmfaqHelperRoute::getCategoryRoute($category->id).'&limit=0#p'.$data['id'];
 		$subject = JText::sprintf('COM_SMFAQ_MAIL_SUBJECT_ANSWER', $category->title);

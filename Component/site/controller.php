@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -13,7 +13,7 @@ defined('_JEXEC') or die('@-_-@');
 
 jimport('joomla.application.component.controller');
 
-class SmfaqController extends JController
+class SmfaqController extends JControllerLegacy
 {
 	/**
 	 * Method to display the view
@@ -23,11 +23,13 @@ class SmfaqController extends JController
 	public function display($cachable = true, $urlparams = false)
 	{
 		// Initialise variables.
+		$app = JFactory::getApplication();
 		$user		= JFactory::getUser();
 
-		$vName	= JRequest::getWord('view', 'category');
-		JRequest::setVar('view', $vName);
-		$id	= JRequest::getInt('id');
+		$vName	= $app->input->get('view', 'category');
+		$app->input->set('view', $vName);
+
+		$id	= $app->input->get('id', null, 'int'); 
 
 		$auth = $user->authorise('core.edit', 'com_smfaq.category.'.$id);
 
@@ -52,7 +54,7 @@ class SmfaqController extends JController
 	{
 		$view = $this->getView('form', 'html');
 		$view->display();
-		return;
+		exit;
 	}
 
 	/**
@@ -62,27 +64,33 @@ class SmfaqController extends JController
 	public function send()
 	{
 		// инициализация переменных для ответа
-		
-		$post = JRequest::get('POST', 0);
+		$app = JFactory::getApplication();
+		$post = $app->input->post;
+		$catid = $post->get('catid', null, 'int');
 
 		$res['valid'] = false;
 		$res['msg'] = '';
 		$res['items'] = array();
 
 		//проверка сессии
-		JRequest::setVar($post['token'], 1);
+		$token = $post->get('token', null, 'alnum');
+		
+		if (version_compare(JVERSION, '3.0') >= 0) {
+		    $app->input->post->set($token, '1');
+		} else {
+		    JRequest::setVar($token, 1);
+		}
 		$sesion = JFactory::getSession();
-		if ($sesion->isNew() || !JRequest::checkToken('request')) {
-			$res['valid'] = false;
+		if (!$sesion->checkToken()) {
+		    $res['valid'] = false;
 			$res['items'][] = array('name' => 'token', 'msg' => JText::_('COM_SMFAQ_SESSION_ERROR'), 't' => $sesion->getFormToken());
 			echo json_encode($res);
-
-			return;
+		    exit;
 		}
 		
 		$user = JFactory::getUser();
 		// проверка ACL
-		if (!$user->authorise('core.create', 'com_smfaq.category.'.(int) $post['catid'])) {
+		if (!$user->authorise('core.create', 'com_smfaq.category.'. $catid)) {
 			$res['valid'] = false;
 			$res['items'][] = array('name' => 'question', 'msg' => JText::_("COM_SMFAQ_ALERTNOAUTHOR"));
 			echo json_encode($res);
@@ -91,7 +99,7 @@ class SmfaqController extends JController
 		
 		// загрузка параметров
 		$categories = JCategories::getInstance('SmFaq');
-		$category = $categories->get((int) $post['catid']);
+		$category = $categories->get($catid);
 		$params = $category->getParams();
 		
 		$res = $this->validateForm($post, $params);
@@ -112,14 +120,14 @@ class SmfaqController extends JController
 					$config = JFactory::getConfig();
 					$cookie_domain = $config->get('cookie_domain', '');
 					$cookie_path = $config->get('cookie_path', '/');
-					setcookie(JApplication::getHash('com_smfaq.name'), $post['created_by'], time() + 365 * 86400, $cookie_path, $cookie_domain);
+					setcookie(JApplication::getHash('com_smfaq.name'), $post->get('created_by', null, 'STRING'), time() + 365 * 86400, $cookie_path, $cookie_domain);
 					if (!$params->get('show_email')) {
-						setcookie(JApplication::getHash('com_smfaq.email'), $post['created_by_email'], time() + 365 * 86400, $cookie_path, $cookie_domain);
+						setcookie(JApplication::getHash('com_smfaq.email'), $post->get('created_by_email', null, 'STRING'), time() + 365 * 86400, $cookie_path, $cookie_domain);
 					}
 				}
-
+				
 				// Установка сообщения
-				if (isset($post['answer_email']) && $post['answer_email']) {
+				if ($post->get('answer_email', 0, 'int') === 1) {
 					$res['msg'] = JText::_('COM_SMFAQ_SEND_OK_SUB');
 				} else {
 					$res['msg'] = JText::_('COM_SMFAQ_SEND_OK');
@@ -153,41 +161,44 @@ class SmfaqController extends JController
 		//проверка имени и email неавторизованого пользователя
 		if ($user->guest) {
 			// убираем id пользователя
-			$post['user_id'] = null;
+			$post->set('user_id', null);
 
-			if (preg_match('/[\"\'\[\]\=\<\>\(\)\;]+/', $post['created_by'] ) || (utf8_strlen($post['created_by']) < 3 )) {
+			$created_by = $post->get('created_by', null, 'STRING');
+			if (preg_match('/[\"\'\[\]\=\<\>\(\)\;]+/', $created_by ) || (utf8_strlen($created_by) < 3 )) {
 				$res['items'][] = array('name' => 'created_by', 'msg' => JText::_('COM_SMFAQ_WRONG_NAME'));
 				$res['valid'] = false;
 			} else {
 				$res['valid'] = true;
 			}
 			if (!$params->get('show_email')) {
-				if(strlen($post['created_by_email']) < 4 || !preg_match('#^([_a-z0-9-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$#i', $post['created_by_email'])) {
+			    $created_by_email = $post->get('created_by_email', null, 'STRING');
+				if(strlen($created_by_email) < 4 || !preg_match('#^([_a-z0-9-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$#i', $created_by_email)) {
 					$res['items'][] = array('name' => 'created_by_email', 'msg' => JText::_('COM_SMFAQ_WRONG_EMAIL'));
 					$res['valid'] = false;
 				}
 			}
 		} else {
 			if ($params->get('created_by_type')) {
-				$post['created_by'] = $user->get('name');
+			    $post->set('created_by', $user->get('name'));
 			} else {
-				$post['created_by'] = $user->get('username');
+			    $post->set('created_by', $user->get('username'));
 			}
 			
-			$post['created_by_email'] = $user->get('email');
-			$post['user_id'] = $user->get('id');
+			$post->set('created_by_email', $user->get('email'));
+			$post->set('user_id', $user->get('id'));
 			$res['valid'] = true;
 		}
 
 		// проверка вопроса
-		if(utf8_strlen($post['question']) < $params->get('min_length_question', 10)) {
+		$question = $post->get('question', null, 'STRING');
+		if(utf8_strlen($question) < $params->get('min_length_question', 10)) {
 			$res['items'][] = array('name' => 'question', 'msg' => JText::sprintf('COM_SMFAQ_WRONG_QUESTION', $params->get('min_length_question')));
 			$res['valid'] = false;
 		}
 
 		// проверка captcha
 		if (($params->get('show_captcha') && $user->guest) || ($params->get('show_captcha') == 2)) {
-			$captcha = $post['captcha'];
+			$captcha = $post->get('captcha', null, 'STRING');
 			$_SESSION['captcha-code'] = isset($_SESSION['captcha-code']) ? $_SESSION['captcha-code'] : false;
 			if ($_SESSION['captcha-code'] && $captcha !== $_SESSION['captcha-code']) {
 				$res['items'][] = array('name' => 'captcha', 'msg' => JText::_('COM_SMFAQ_WRONG_CAPTCHA'));
@@ -209,19 +220,31 @@ class SmfaqController extends JController
 	{
 
 		//проверка сессии
-		JRequest::setVar(JRequest::getVar('token', 0, 'POST'), 1);
-		$session = JFactory::getSession();
-		if ($session->isNew() || !JRequest::checkToken()) {
+		$app = JFactory::getApplication();
+		$token = $app->input->get('token', null, 'alnum');
+
+		if (version_compare(JVERSION, '3.0') >= 0) {
+			$app->input->post->set($token, '1');
+		} else {
+		    JRequest::setVar($token, 1);
+		}
+		
+		if (!JSession::checkToken('post')) {
 			echo JText::_('COM_SMFAQ_SESSION_ERROR');
-			return;
+			exit;
 		}
 
-		$id = JRequest::getInt('id', null, 'POST');
-		$vote_value = JRequest::getInt('vote', 0, 'POST');
 
+		$id = $app->input->get('id', null, 'int');
+		$vote_value = $app->input->get('vote', 0, 'int');
+        $catid = $app->input->get('catid', 0, 'int');
+        if (!$catid) {
+        	echo 'SmFagError: Category not found';
+        	exit;
+        }
 		// получение параметров категории
 		$categories = JCategories::getInstance('SmFaq');
-		$category = $categories->get(JRequest::getInt('catid'));
+		$category = $categories->get($catid);
 		$params = $category->getParams();
 
 		// проверка включения опроса в категории
@@ -237,7 +260,7 @@ class SmfaqController extends JController
 		if ($vote_value == 0) {
 			$view = $this->getView('comments', 'html');
 			$view->display();
-			return;
+			exit;
 		} else {
 			$html = '<strong>'.JText::_('COM_SMFAQ_SANKS_FOR_VOTE').'</strong>';
 		}
@@ -252,7 +275,7 @@ class SmfaqController extends JController
 	 */
 	public function captcha()
 	{
-		$kcaptcha = JPATH_COMPONENT.DS.'libraries'.DS.'kcaptcha'.DS.'kcaptcha.php';
+		$kcaptcha = JPATH_COMPONENT.'/libraries/kcaptcha/kcaptcha.php';
 
 		if (is_file($kcaptcha)) {
 			if (!class_exists('KCAPTCHA')) {
@@ -269,30 +292,40 @@ class SmfaqController extends JController
 	 * Метод для отправки комментария
 	 */
 	public function comment() {
-		//проверка сессии
+	    
+	    $app = JFactory::getApplication();
+		
+	    $res = array();
 		$res['valid'] = false;
-		JRequest::setVar(JRequest::getVar('token'), 1);
-		$session = JFactory::getSession();
-		if ($session->isNew() || !JRequest::checkToken()) {
-			$res['t'] = JSession::getFormToken();
-			$res['msg'] = JText::_('COM_SMFAQ_SESSION_ERROR');
-			echo json_encode($res);
-			return;
+		
+		//проверка сессии
+		$token = $app->input->get('token', null, 'alnum');
+		if (version_compare(JVERSION, '3.0') >= 0) {
+		    $app->input->post->set($token, '1');
+		} else {
+		    JRequest::setVar($token, 1);
 		}
+		if (!JSession::checkToken()) {
+		    $res['t'] = JSession::getFormToken();
+		    $res['msg'] = JText::_('COM_SMFAQ_SESSION_ERROR');
+		    echo json_encode($res);
+		    exit;
+		}
+		
 
-		$id = JRequest::getInt('id','','POST');
-		$comment = JRequest::getString('comment','','POST');
+		$id = $app->input->get('id', null, 'int');
+		$comment =  $app->input->get('comment', null,'STRING');
 
 		// проверка на кол-во символов
 		if(utf8_strlen($comment) < 10 ) {
 			$res['msg'] = JText::_('COM_SMFAQ_COMMENT_ERR_MSG');
 			echo json_encode($res);
-			return;
+			exit;
 		}
-		$datenow = JFactory::getDate()->toSQL();
+
 		$db		= JFactory::getDBO();
 		$query = 'INSERT INTO #__smfaq_comments (question_id, comment, created)'.
-				' VALUES ('.(int) $id.',' .$db->Quote($db->getEscaped($comment)). ','.$db->Quote($datenow).')';
+				' VALUES ('.(int) $id.',' .$db->quote($comment). ', NOW())';
 		$db->setQuery($query);
 		if (!$db->query()) {
 			$res['valid'] = false;

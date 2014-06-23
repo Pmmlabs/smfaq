@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -24,12 +24,18 @@ class SmFaqHelper
 	 */
 	public static function addSubmenu($vName)
 	{
-		JSubMenuHelper::addEntry(
+	    if (version_compare(JVERSION, '3.0') >= 0) {
+	        $class = 'JHtmlSidebar';
+	    } else {
+	        $class = 'JSubMenuHelper';
+	    }
+	    
+		$class::addEntry(
 			JText::_('COM_SMFAQ_QUESTIONS_MENU'),
 			'index.php?option=com_smfaq&view=smfaqlist',
 			$vName == 'smfaqlist'
 		);
-		JSubMenuHelper::addEntry(
+		$class::addEntry(
 			JText::_('COM_SMFAQ_CATEGORY_MENU'),
 			'index.php?option=com_categories&extension=com_smfaq',
 			$vName == 'categories'
@@ -41,7 +47,7 @@ class SmFaqHelper
 			
 		}
 		
-		JSubMenuHelper::addEntry(
+		$class::addEntry(
 			JText::_('COM_SMFAQ_INFO'),
 			'index.php?option=com_smfaq&view=info',
 			$vName == 'info'

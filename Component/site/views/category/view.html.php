@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -13,7 +13,7 @@ defined('_JEXEC') or die('@-_-@');
 
 jimport( 'joomla.application.component.view');
 
-class SmfaqViewCategory extends JView
+class SmfaqViewCategory extends JViewLegacy
 {
 	protected $state;
 	protected $items;
@@ -66,7 +66,7 @@ class SmfaqViewCategory extends JView
 		}
 		
 		//set print layout
-		$print = JRequest::getCmd('tmpl');
+		$print = $app->input->get('tmpl');
 		if ($print == 'component') {
 			$this->assignRef('items', $items);
 			parent::display('print');
@@ -138,7 +138,7 @@ class SmfaqViewCategory extends JView
 
 		// Подключение js и стилей
 		$catid = $this->category->id;
-		$jscript = 'SmFaq.url = \'index.php?option=com_smfaq&amp;catid='.$catid.'&amp;format=raw&amp;task=\';';
+		$jscript = 'SmFaq.url = \'index.php?option=com_smfaq&amp;catid='.$catid.'&amp;task=\';';
 		$this->document->addScriptDeclaration($jscript);
 		
 		$baseurl = $this->document->baseurl;
@@ -149,7 +149,7 @@ class SmfaqViewCategory extends JView
 		$menu = $menus->getActive();
 		
 		if (!$menu) {
-			$menus->setActive(JRequest::getInt('Itemid', null));
+			$menus->setActive($app->input->get('Itemid', null, 'int'));
 		}
 		if ($menu) {
 			$id = (int) $menu->query['id'];

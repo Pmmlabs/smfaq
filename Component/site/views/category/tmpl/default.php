@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -61,7 +61,7 @@ if ($canCreate && !$canEdit) :
 <?php elseif ($canEdit) : ?>
 	<a href="<?php echo JRoute::_('index.php?option=com_smfaq&amp;task=edit.add&amp;catid='.$this->category->id); ?>" class="button">
 	<?php echo JText::_('COM_SMFAQ_NEW_QUESTION'); ?></a>
-	<span class="button" style="margin-left:10px;" onclick="SmFaq.unpublished(<?php echo JRequest::getInt('Itemid', null); ?>)">
+	<span class="button" style="margin-left:10px;" onclick="SmFaq.unpublished(<?php echo JFactory::getApplication()->input->get('Itemid', null, 'int'); ?>)">
 	<?php echo JText::_('COM_SMFAQ_SHOW_NO_ANSWER_QUESTIONS'); ?></span>
 	<div id="smfaq-unpub"></div>
 <?php endif; ?>

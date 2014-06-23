@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -31,14 +31,20 @@ class JFormFieldVotes extends JFormField
 	 */
 	protected function getInput()
 	{
-		$id = JRequest::getInt('id');
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('vote_yes, vote_no');
-		$query->from('#__smfaq_votes');
-		$query->where('question_id =' . (int) $id);
-		$db->setQuery($query);
-		$votes = $db->loadObject();
+		$id = JFactory::getApplication()->input->get('id', null, 'int');
+
+		if ($id) {
+		    $db = JFactory::getDbo();
+		    $query = $db->getQuery(true);
+		    $query->select('vote_yes, vote_no');
+		    $query->from('#__smfaq_votes');
+		    $query->where('question_id =' . $id);
+		    $db->setQuery($query);
+		    $votes = $db->loadObject();			
+		} else {
+		    $votes = null;
+		}
+
 		if ($votes) {
 			$html = '<div id="smfaq-votes"><span class="vote-yes-smfaq">' . JText::sprintf('COM_SMFAQ_ANSWER_HELP', $votes->vote_yes) . '</span>';
 			$html .= '<span class="vote-no-smfaq">' . JText::sprintf('COM_SMFAQ_ANSWER_NOT_HELP', $votes->vote_no) . '</span>';

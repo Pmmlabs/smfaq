@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -31,16 +31,22 @@ class JFormFieldComments extends JFormField
 	 */
 	protected function getInput()
 	{
-		$id = JRequest::getInt('id');
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('comment, created, id');
-		$query->from('#__smfaq_comments');
-		$query->where('question_id =' . (int) $id);
-		$db->setQuery($query);
-		$comments = $db->loadObjectList();
+		$id = JFactory::getApplication()->input->get('id', null, 'int');
+		if ($id) {
+		    $db = JFactory::getDbo();
+		    $query = $db->getQuery(true);
+		    $query->select('comment, created, id');
+		    $query->from('#__smfaq_comments');
+		    $query->where('question_id =' . $id);
+		    $db->setQuery($query);
+		    $comments = $db->loadObjectList();			
+		} else {
+		    $comments = null;
+		}
+
+
 		if ($comments) {
-			$html = '<table class="adminlist"><thead><tr>
+			$html = '<table class="adminlist table table-striped"><thead><tr>
 				<th width="10">'.JText::_('COM_SMFAQ_FIELD_CREATED_LABEL').'</th>
         		<th>'.JText::_('COM_SMFAQ_COMMENT').'</th>
         		<th width="10">'.JText::_('COM_SMFAQ_DELETE').'</th>
@@ -48,7 +54,7 @@ class JFormFieldComments extends JFormField
 			$i = 1;
 			foreach ($comments as $comment) {
 				$html .= '<tr id="comment-'.$comment->id.'" class="row'. $i % 2 .'">';
-				$html .= '<td>'.JHTML::_('date',$comment->created, JText::_('COM_SMFAQ_DATE_FORMAT')).'</td>';
+				$html .= '<td>'.JHTML::_('date', $comment->created, JText::_('COM_SMFAQ_DATE_FORMAT')).'</td>';
 				$html .= '<td>'.$comment->comment.'</td>';
 				$html .= '<td class="center"><div title="'.JText::_('COM_SMFAQ_DELETE_DESC').'" onclick="return SmFaq.delcomment('.$comment->id.',this)" class="smfaq-delete"></div></td>';
 				$html .= '</tr>';

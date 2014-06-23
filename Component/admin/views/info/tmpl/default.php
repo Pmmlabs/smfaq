@@ -2,15 +2,18 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
 // защита от прямого доступа
 defined('_JEXEC') or die('@-_-@');
 ?>
+<?php  if (version_compare(JVERSION, '3.0') >= 0) :?>
+    <div class="span2"><?php echo JHtmlSidebar::render(); ?></div>
+<?php endif; ?>
 <div style="width:400px;margin:auto;background:#FFFFFF;padding:20px;-webkit-border-radius:20px;-moz-border-radius:20px;border-radius:20px;border:1px solid #157BAF">
 <img align="left" alt="SM FAQ" src="<?php echo JURI::root(); ?>/media/com_smfaq/images/smfaq-logo.png" />
 <div style="text-align:center;padding-top:40px;">

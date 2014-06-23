@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -17,21 +17,22 @@ class SmfaqViewCategory extends JView
 {
 	function display($tpl = null)
 	{
-		global $mainframe;
+		$app = JFactory::getApplication();
+		$document = JFactory::getDocument();
 
-		$document =& JFactory::getDocument();
+		$id = $app->input->get('id', null, 'int');
+		$document->link = JRoute::_('index.php?option=com_smfaq&view=category&id=' . $id);
 
-		$document->link = JRoute::_('index.php?option=com_smfaq&view=category&id='.JRequest::getVar('id',null, '', 'int'));
 
-		JRequest::setVar('limit', $mainframe->getCfg('feed_limit'));
-		$siteEmail = $mainframe->getCfg('mailfrom');
-		$fromName = $mainframe->getCfg('fromname');
+		$app->input->set('limit', $app->getCfg('feed_limit'));
+		$siteEmail = $app->getCfg('mailfrom');
+		$fromName = $app->getCfg('fromname');
 		$document->editor = $fromName;
 		$document->editorEmail = $siteEmail;
 
 		// Get some data from the model
-		$items		=& $this->get( 'data' );
-		$category	=& $this->get( 'category' );
+		$items		= $this->get( 'data' );
+		$category	= $this->get( 'category' );
 		$i = 1;
 		foreach ( $items as $item )
 		{

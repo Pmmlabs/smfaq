@@ -13,7 +13,7 @@ defined('_JEXEC') or die('@-_-@');
 
 jimport( 'joomla.application.component.view');
 
-class SmfaqViewComments extends JView
+class SmfaqViewComments extends JViewLegacy
 {
 
 	/**
@@ -22,9 +22,10 @@ class SmfaqViewComments extends JView
 	 */
 	public function display($tpl = null)
 	{
+	    $app = JFactory::getApplication();
 
-		$id = JRequest::getInt('id', null, 'POST');
-		$catid = JRequest::getInt('catid', null, 'catid');
+		$id = $app->input->get('id', null, 'int');
+		$catid = $app->input->get('catid', null, 'int');
 
 		$categories = JCategories::getInstance('SmFaq');
 		$category = $categories->get($catid);

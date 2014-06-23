@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -54,7 +54,7 @@ class SmFAQControllerSmfaq extends JControllerForm
 	{
 		// Initialise variables.
 		$user		= JFactory::getUser();
-		$categoryId	= JArrayHelper::getValue($data, 'catid', JRequest::getInt('filter_category_id'), 'int');
+		$categoryId	= JArrayHelper::getValue($data, 'catid', JFactory::getApplication()->input->get('filter_category_id', null, 'int'));
 		$allow		= null;
 
 		if ($categoryId) {

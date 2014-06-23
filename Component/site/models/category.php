@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -64,7 +64,6 @@ class SmfaqModelCategory extends JModelList
 		// Выборка нужных полей.
 		$query->select('a.*');
 		$query->from('`#__smfaq` AS a');
-
 
         if (isset($params->answer_created_by_type) && (int) $params->answer_created_by_type === 1) {
 			$query->select('u.name AS answer_created_by');
@@ -126,7 +125,7 @@ class SmfaqModelCategory extends JModelList
 		$user	= JFactory::getUser();
 		$groups	= $user->getAuthorisedViewLevels();
 
-		$id = (int) JRequest::getInt('id');
+		$id = $app->input->get('id', null, 'int');
 		$this->setState('category.id', $id);
 
 		// параметры категории
@@ -149,7 +148,7 @@ class SmfaqModelCategory extends JModelList
 		$limit = $app->getUserStateFromRequest('global.list.limit', 'limit', $params->get('list_limit', 10));
 		$this->setState('list.limit', $limit);
 
-		$limitstart = JRequest::getVar('limitstart', 0, '', 'int');
+		$limitstart = $app->input->get('limitstart', 0, 'int'); 
 		$this->setState('list.start', $limitstart);
 
 
@@ -296,27 +295,34 @@ class SmfaqModelCategory extends JModelList
 	{
 		$table = $this->getTable('Smfaq');
 
-		$post['created'] = JFactory::getDate()->toMySQL();
-		$post['ip'] = $_SERVER['REMOTE_ADDR'];
-
-		// удаляем ненужные значения если такие будут
-		unset($post['answer'], $post['checked_out'], $post['checked_out_time'],
-		$post['published'], $post['answer_created'], $post['answer_state'],
-		$post['access'], $post['answer_created_by_id']);
+		$ignore = array('answer', 'checked_out', 'checked_out_time', 'answer_state', 'published', 'answer_created', 'access', 'answer_created_by_id');
 
 		// установка порядка
-		$where = 'catid = ' . (int) $post['catid'];
+		$where = 'catid = ' . $post->get('catid', null, 'int');
 		$table->ordering = $table->getNextOrder( $where );
+		
+		//на будущее
+		if (version_compare(JVERSION, '4.0') >= 0) {
+		    $post->set('created', JFactory::getDate()->toSql());
+		    $post->set('ip', $_SERVER['REMOTE_ADDR']);
+		    //$post = $post->getArray();
+		    //$post = $post->post;
+		    die( var_dump($post) );
+		} else {
+		    $post = JRequest::get('post');
+		    $post['created'] = JFactory::getDate()->toSql();
+		    $post['ip'] = $_SERVER['REMOTE_ADDR'];
+		}		
 
 		// Bind the form fields to  table
-		if (!$table->bind($post)) {
+		if (!$table->bind($post, $ignore)) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
 
 		// Make sure table is valid
 		if (!$table->check()) {
-			$this->setError($this->_db->getErrorMsg());
+			$this->setError($table->getError());
 			return false;
 		}
 

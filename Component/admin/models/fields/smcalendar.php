@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -58,7 +58,7 @@ class JFormFieldSmCalendar extends JFormField
 		
 		$time = JHtml::date('now', 'Hi');
 		
-		$html = '<input name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'"'. $readonly. ' /><img onmouseover="this.style.cursor=\'pointer\'" src="media/com_smfaq/images/calendar_icon.png" alt="Calendar" id="cal-'.$this->element['name'].'" />';
+		$html = '<input name="'.$this->name.'" id="'.$this->id.'" value="'.$this->value.'"'. $readonly. ' /><img onmouseover="this.style.cursor=\'pointer\'" src="'.JUri::root().'media/com_smfaq/images/calendar_icon.png" alt="Calendar" id="cal-'.$this->element['name'].'" />';
 
 
 		$html .= '<script type="text/javascript">

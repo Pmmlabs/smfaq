@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -13,7 +13,7 @@ defined('_JEXEC') or die('@-_-@');
 
 jimport( 'joomla.application.component.view');
 
-class SmfaqViewQuestion extends JView
+class SmfaqViewQuestion extends JViewLegacy
 {
 	protected $item;
 	protected $user;
@@ -46,7 +46,7 @@ class SmfaqViewQuestion extends JView
 			$this->setLayout($layout);
 		}
 
-		$print = JRequest::getCmd('tmpl');
+		$print = $app->input->get('tmpl');
 		if ($print == 'component') {
 			parent::display('print');
 			return;

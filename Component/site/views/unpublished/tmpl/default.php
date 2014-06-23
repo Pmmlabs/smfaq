@@ -2,16 +2,16 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
 // защита от прямого доступа
 defined('_JEXEC') or die('@-_-@'); ?>
 <?php if ($this->items) : 
-$Itemid = JRequest::getInt('Itemid', null);
+$Itemid = JFactory::getApplication()->input->get('Itemid', null, 'int');
 ?>
 <div>
 	<ul>

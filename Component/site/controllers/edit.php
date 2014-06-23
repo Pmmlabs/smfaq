@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -54,7 +54,7 @@ class SmfaqControllerEdit extends JControllerForm
 		// Clear the record edit information from the session.
 		$app->setUserState($context . '.data', null);
 		
-		$catid = JRequest::getInt('catid');
+		$catid = $app->input->get('catid', null, 'int'); 
 
 		// Redirect to the edit screen.
 		$this->setRedirect(
@@ -72,9 +72,9 @@ class SmfaqControllerEdit extends JControllerForm
 	 */
 	protected function allowAdd($data = array())
 	{
-	
+	    $app = JFactory::getApplication();
 		$user 	= JFactory::getUser();
-		$catId	= JRequest::getInt('catid');
+		$catId	=  $app->input->get('catid', null, 'int'); 
 		$allow	= false;
 		if (!$user->guest && $catId) {
 			$allow = $user->authorise('core.edit', 'com_smfaq.category.'.$catId);
@@ -88,13 +88,14 @@ class SmfaqControllerEdit extends JControllerForm
 	 */	
 	protected function allowEdit($data = array(), $urlVar = null)
 	{
+	    $app = JFactory::getApplication();
 		$user 	= JFactory::getUser();
-		$catid = JRequest::getInt('catid');
+		$catid =  $app->input->get('catid', null, 'int'); 
 		if ($user->guest || ($user->authorise('core.edit', 'com_smfaq.category.'.$catid) !== true)) {
 			return false;
 		}
 
-		$record		= $this->getModel()->getItem(JRequest::getInt($urlVar));
+		$record		= $this->getModel()->getItem($app->input->get($urlVar, null, 'int'));
 		if ($user->authorise('core.edit', 'com_smfaq.category.'.$record->catid)) {
 			return true;
 		}
@@ -106,7 +107,7 @@ class SmfaqControllerEdit extends JControllerForm
 	/*
 	*	Проверка прав на сохранение вопроса редактором
 	*/	
-	protected function allowSave($data = array())
+	protected function allowSave($data, $key = 'id')
 	{
 		$user 	= JFactory::getUser();
 		$catId	= JArrayHelper::getValue($data, 'catid', null, 'int');
@@ -121,17 +122,21 @@ class SmfaqControllerEdit extends JControllerForm
 	
 	public function edit($key = 'id', $urlVar = 'id')
 	{
+	    $app = JFactory::getApplication();
 		if (!$this->allowEdit(null, 'id')) {
 			$this->setError(JText::_('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED'));
 			$this->setMessage($this->getError(), 'error');
-			$return = 'index.php?option=com_smfaq&task=edit.edit&id='.JRequest::getInt('id').'&catid='.JRequest::getInt('catid');
+			
+			$id = $app->input->get('id', null, 'int');
+			$catid = $app->input->get('catid', null, 'int'); 
+			$return = 'index.php?option=com_smfaq&task=edit.edit&id='.$id.'&catid='.$catid;
 			$this->setRedirect(JRoute::_('index.php?option=com_users&task=login&return='.base64_encode($return)));
 			return false;
 		}
 		parent::edit($key, $urlVar);
 	}	
 	
-	protected function postSaveHook(JModel &$model, $validData)
+	protected function postSaveHook(JModelLegacy $model, $validData = array())
 	{
 		$task = $this->getTask();
 		if ($task == 'save') {
@@ -142,16 +147,17 @@ class SmfaqControllerEdit extends JControllerForm
 	public function cancel($key = null) 
 	{
 		if (parent::cancel($key)) {
-			$catid = JRequest::getInt('catid');
+			$catid =  JFactory::getApplication()->input->get('catid', null, 'int');
 			$this->setRedirect(JRoute::_(SmfaqHelperRoute::getCategoryRoute($catid), false));;
 		}
 	}
 	
 	protected function getRedirectToItemAppend($recordId = null, $urlVar = 'id')
 	{
-		$tmpl = JRequest::getCmd('tmpl');
-		$layout = JRequest::getCmd('layout', 'edit');
-		$catid =  JRequest::getInt('catid', null);
+	    $app = JFactory::getApplication();
+	    $tmpl = $app->input->get('tmpl');
+		$layout =  $app->input->get('layout', 'edit'); 
+		$catid =  $app->input->get('id', null, 'int'); 
 		
 		$append = '';
 	

@@ -2,9 +2,9 @@
 /**
  * SMFAQ
  *
- * @package		component for Joomla 1.6. - 2.5
- * @version		1.7 beta 1
- * @copyright	(C)2009 - 2012 by SmokerMan (http://joomla-code.ru)
+ * @package		Component for Joomla 2.5.6+
+ * @version		1.7.3
+ * @copyright	(C)2009 - 2013 by SmokerMan (http://joomla-code.ru)
  * @license		GNU/GPL v.3 see http://www.gnu.org/licenses/gpl.html
  */
 
@@ -15,7 +15,7 @@ jimport('joomla.application.component.view');
 /**
  * Вид для редактирования записи
  */
-class SmFAQViewSmfaq extends JView
+class SmFAQViewSmfaq extends JViewLegacy
 {
 
 	protected $form;
@@ -46,32 +46,35 @@ class SmFAQViewSmfaq extends JView
 
 		//установки календарика
 		$baseurl = JURI::root();
-		require_once JPATH_SITE.DS.'components/com_smfaq/libraries/calendar/calendar.php';
+		require_once JPATH_SITE.'/components/com_smfaq/libraries/calendar/calendar.php';
 		SmfaqHelperCalendar::setup();
 		$this->document->addScript( $baseurl . 'components/com_smfaq/libraries/calendar/js/jscal2.js');
 		$this->document->addStyleSheet( $baseurl . 'components/com_smfaq/libraries/calendar/css/jscal2.css');
 		$this->document->addStyleSheet( $baseurl . 'components/com_smfaq/libraries/calendar/css/gold/gold.css');		
 		
 		// Установка тулбара
+		if (version_compare(JVERSION, '3.0') >= 0) {
+		    $tpl = '3';
+		}
 		$this->_setToolBar();
 		// Отображаем шаблон
 		parent::display($tpl);
 	}
+	
+	
 	/**
 	 * Метод для установки заголовка и тулбара
 	 */
 	protected function _setToolBar()
 	{
 		// Скрываем главное меню
-		JRequest::setVar('hidemainmenu', 1);
+		JFactory::getApplication()->input->set('hidemainmenu', 1);
 		// Подключение скриптов для тулбара
 		JHTML::_('behavior.tooltip');
 		// Установка живучести сессии
 		JHTML::_('behavior.keepalive');
 		// Подключение скриптов проверки формы
 		JHTML::_('behavior.formvalidation');
-
-
 
 		// Проверка на новую запись
 		if ($this->form->getValue('id') < 1) {
