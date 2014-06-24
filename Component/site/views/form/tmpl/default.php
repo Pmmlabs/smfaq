@@ -14,9 +14,16 @@ defined('_JEXEC') or die('@-_-@'); ?>
 $user = JFactory::getUser();
 
 if ($user->guest) {
-	$created_by = $this->escape(JRequest::getString(JApplication::getHash('com_smfaq.name'),'','cookie', null));
-	$created_by_email = $this->escape(JRequest::getString(JApplication::getHash('com_smfaq.email'),'','cookie', null));
+    $app = JFactory::getApplication();
 
+    if (method_exists($app,'getHash')) { /* joomla <= 3.1.5 */
+        $created_by = $this->escape( $app->input->cookie->get($app->getHash('com_smfaq.name'), null, 'STRING') );
+        $created_by_email = $this->escape( $app->input->cookie->get($app->getHash('com_smfaq.email'), null, 'STRING') );
+    } else {
+        $created_by = $this->escape( $app->input->cookie->get(JApplicationHelper::getHash('com_smfaq.name'), null, 'STRING') );
+        $created_by_email = $this->escape( $app->input->cookie->get(JApplicationHelper::getHash('com_smfaq.email'), null, 'STRING') );
+    }
+	
 	//установка значений из куки
 	if ($created_by) {
 		$this->form->setValue('created_by', null, $created_by);
@@ -24,24 +31,25 @@ if ($user->guest) {
 	if ($created_by_email) {
 		$this->form->setValue('created_by_email', null, $created_by_email);;
 	}
-
+	
 }
 
 ?>
 <form action="#" name="smfaq-form" id="smfaq-form" method="post" >
 
 	<div class="titleform"><?php echo JText::_('COM_SMFAQ_TITLE_FORM'); ?></div>
-	<?php if ($user->guest) {
-		echo $this->form->getLabel('created_by');
-		echo $this->form->getInput('created_by');
-		if ($this->params->get('show_email', 0) != 2) {
-			echo $this->form->getLabel('created_by_email');
-			echo $this->form->getInput('created_by_email');
+	<?php if ($user->guest) { 
+			echo $this->form->getLabel('created_by'); 
+			echo $this->form->getInput('created_by'); 
+			if ($this->params->get('show_email', 0) != 2) {
+				echo $this->form->getLabel('created_by_email');
+				echo $this->form->getInput('created_by_email');
+			}
 		}
 		foreach ($this->form->getFieldset('details') as $field) {
 			echo $field->label;
-			echo $field->input;
-		}
+			echo $field->input; 
+		}		
 		echo $this->form->getLabel('question');
 		echo $this->form->getInput('question');
 		if ($this->params->get('show_char_count', 1)) {
@@ -60,7 +68,7 @@ if ($user->guest) {
 			echo $this->form->getLabel('answer_email');
 			echo '</div>';
 		}
-	} ?>
+	?>
     <div class="clr"></div>
 	<input type="button" class="button" onclick="SmFaq.sendform(this.form)" value="<?php echo JText::_('COM_SMFAQ_SEND'); ?>" />
 	<?php if (!$this->params->get('show_form', 0)) : ?>
