@@ -6,3 +6,8 @@
 * Extract directory that you need
 * Add the extracted directory in zip archive
 * Install your zip archive to Joomla (Extension Manager -> install)
+
+or:
+
+* Download [latest release](https://github.com/Pmmlabs/smfaq/releases/latest) of component
+* Install this zip archive to Joomla (Extension Manager -> install)
