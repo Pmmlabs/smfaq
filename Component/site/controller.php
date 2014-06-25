@@ -94,7 +94,7 @@ class SmfaqController extends JControllerLegacy
 			$res['valid'] = false;
 			$res['items'][] = array('name' => 'question', 'msg' => JText::_("COM_SMFAQ_ALERTNOAUTHOR"));
 			echo json_encode($res);
-			return;
+			exit;
 		}
 		
 		// загрузка параметров
