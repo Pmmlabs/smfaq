@@ -63,7 +63,7 @@ class SmfaqModelQuestion extends JModelLegacy
 		// для редакторов
 		if ($user->authorise('core.edit', 'com_smfaq.category.'.$this->getState('category.id'))) {
 			$query->select('v.vote_yes, v.vote_no, count(co.id) AS comments');
-			$query->join('LEFT', '#__smfaq_votes AS v ON v.question_id = a.id');
+			$query->leftjoin('#__smfaq_votes AS v ON v.question_id = a.id');
 			$query->leftjoin('#__smfaq_comments AS co ON a.id = co.question_id ');
 			$query->group('a.id');
 		}
