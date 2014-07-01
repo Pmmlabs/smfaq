@@ -11,3 +11,7 @@ or:
 
 * Download [latest release](https://github.com/Pmmlabs/smfaq/releases/latest) of component
 * Install this zip archive to Joomla (Extension Manager -> install)
+
+# Добавлен модуль (01.07.14)
+Модуль для SM FAQ позволяет выводить один вопрос и ответ на любой странице сайта в любой позиции.
+Частично был позамствован код модуля [Евгения Каляды](http://color-rain.ru/blog/joomla/modul-voprosov-otvetov-sm-faq), но кое-что исправлено, а кое-что убрано (то, что показалось мне лишним).

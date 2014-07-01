@@ -1,0 +1,12 @@
+/* Стиль Default */
+.question {
+    font-weight: bold;
+}
+.question_by {
+    font-style: italic;
+    text-align: right;
+}
+.answerContainer {
+    border-left: solid;
+    padding-left: 10px;
+}
