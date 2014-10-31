@@ -387,8 +387,10 @@ class SmfaqModelCategory extends JModelList
 					$db		= JFactory::getDBO();
 					$query = 'SELECT email FROM #__users WHERE id IN ('.$users_id.')';
 					$db->setQuery($query);
-					$emails = $db->loadResultArray();
-				
+					if (method_exists($db,'loadResultArray')) // joomla < 3.x
+						$emails = $db->loadResultArray();
+					else	// joomla >= 3.x
+						$emails = $db->loadColumn();
 					if ($emails) {
 						$config	= JFactory::getConfig();
 						$mailfrom = $config->get('mailfrom');
